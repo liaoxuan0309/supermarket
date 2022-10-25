@@ -1,9 +1,9 @@
 <template>
   <div>
-    <grid-view :cols="3" :lineSpace="15" :v-margin="20" v-if="subcategories.list">
+    <grid-view :cols="3" :line-space="15" :v-margin="20" v-if="subcategories.list">
       <div class="item" v-for="(item, index) in subcategories.list" :key="index">
         <a :href="item.link">
-          <img class="item-img" :src="item.image" alt="">
+          <img class="item-img" :src="item.image" @load="isload">
           <div class="item-text">{{item.title}}</div>
         </a>
       </div>
@@ -12,6 +12,7 @@
 </template>
 
 <script>
+  import {debounce} from 'common/utils'
   import GridView from 'components/common/gridView/GridView'
 
   export default {
@@ -25,6 +26,11 @@
         default() {
           return []
         }
+      }
+    },
+    methods:{
+      isload(){
+        this.$emit('isload')
       }
     }
   }
@@ -42,6 +48,7 @@
 
   .item-img {
     width: 80%;
+    height: 70%;
   }
 
   .item-text {

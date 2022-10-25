@@ -8,15 +8,16 @@
                        @tabclick="tabClick"
                        class="tabcontrol2"
                        v-show="istabcontrol2show"></tabcontrol>
-      <btscroll id="tab-content" :data="[categoryData]" ref="bs" :probetypenum="3" :upload="true">
+      <btscroll id="tab-content" :data="[categoryData]" ref="bs" :probetypenum="3" :upload="true" @scroll="scroll">
         <div>
-          <tab-content-category :subcategories="showSubcategory"></tab-content-category>
+          <tab-content-category :subcategories="showSubcategory" @isload="isload"></tab-content-category>
           <tabcontrol ref="tabcontrol1" :titles="['综合', '新品', '销量']"
                        @tabclick="tabClick"></tabcontrol>
          
           <tab-content-detail :category-detail="showCategoryDetail"></tab-content-detail>
         </div>
       </btscroll>
+    <backtop @click.native="backtop(tabcontrol1offsettop)" v-show="isshowbacktop" />
     </div>
   </div>
 </template>
@@ -31,9 +32,11 @@
   import TabContentDetail from './childComps/TabContentDetail'
 
   import {getCategory, getSubcategory, getCategoryDetail} from "network/category";
-  import {POP, SELL, NEW} from "@/common/const";
-  import {tabControlMixin} from "@/common/mixin";
-
+  
+  import {debounce} from 'common/utils'
+  import {POP, SELL, NEW} from "common/const";
+  import {tabControlMixin,backtopmixin} from "common/mixin";
+  
   export default {
 		name: "Category",
     components: {
@@ -44,14 +47,15 @@
       TabContentCategory,
       TabContentDetail
     },
-    mixins: [tabControlMixin],
+    mixins: [tabControlMixin,backtopmixin],
     data() {
 		  return {
 		    categories: [],
         categoryData: {
         },
         currentIndex: -1,
-        istabcontrol2show:false
+        istabcontrol2show:false,
+        tabcontrol1offsettop:null,
       }
     },
     created() {
@@ -114,7 +118,25 @@
        */
       selectItem(index) {
         this._getSubcategories(index)
+      },
+      scroll(opsition){
+        this.isshow(opsition)
+        //判断是否展示第二个tabcontrol2
+        this.istabcontrol2show= this.tabcontrol1offsettop>opsition.y
+      },
+      isload(){
+        //刷新betterscroll
+        this.$refs.bs.refreshs()
+        //对图片加载完立即就记录数值可能会造成记录的数值偏大，在最后一张图片加载完后过0.2秒再保存值
+        setTimeout(() => {
+          this.tabcontrol1offsettop=this.$refs.tabcontrol1.$el.offsetTop *-1
+        }, 200);
       }
+    },
+    mounted() {
+      this.$bus.$on('isload',()=>{
+        this.$refs.bs.refreshs()
+      })
     }
 	}
 </script>

@@ -43,12 +43,12 @@ const backtopmixin={
   methods: {
     isshow(opsition){
       /* console.log(opsition) */
-      //判断是否返回顶部
+      //判断是否显示返回顶部
         this.isshowbacktop= -opsition.y>1000
     },
-    backtop(){
+    backtop(value=0){
       //获取子组件Btscroll.vue中的scrollto方法，然后使用scrollto方法实现回到顶端
-      this.$refs.bs.scrollto(0,0,500)
+      this.$refs.bs.scrollto(0,value,500)
     },
   }
 }
