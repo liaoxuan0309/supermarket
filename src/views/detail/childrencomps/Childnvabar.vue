@@ -51,4 +51,7 @@ export default {
   .navbar{
     background-color:white;
   }
+  .center_item:hover {
+    color: var(--color-tint);
+  }
 </style>
